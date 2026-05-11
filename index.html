@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trắc nghiệm Lịch sử 10</title>
+<style>
+body{margin:0;padding:20px;background:#0f172a;color:white;font-family:Arial}
+.container{max-width:950px;margin:auto}
+h1{text-align:center;color:#38bdf8}
+.top{position:sticky;top:0;background:#0f172a;padding:10px;z-index:99}
+button{cursor:pointer}
+.reload{width:100%;padding:14px;border:0;border-radius:12px;background:#2563eb;color:white;font-size:17px}
+.score{text-align:center;font-size:22px;font-weight:bold;margin:10px}
+.question{background:#1e293b;margin:15px 0;padding:18px;border-radius:14px}
+.answer{width:100%;padding:12px;margin:7px 0;border:0;border-radius:10px;background:#334155;color:white;text-align:left;font-size:15px}
+.answer:hover{background:#475569}
+.correct{background:#16a34a!important}
+.wrong{background:#dc2626!important}
+.result{font-weight:bold;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>TRẮC NGHIỆM LỊCH SỬ 10</h1>
+
+<div class="top">
+<button class="reload" onclick="loadQuiz()">Làm lại / Đổi thứ tự 100 câu</button>
+<div class="score" id="score">Điểm: 0/100</div>
+</div>
+
+<div id="quiz"></div>
+</div>
+
+<script>
+const questions = [
+{q:"Quốc gia khởi đầu trong cuộc cách mạng công nghiệp lần thứ nhất diễn ra vào giữa thế kỉ XVIII là?",a:["Anh","Mĩ","Đức","Pháp"],correct:0},
+{q:"Ở thế kỉ XVIII, những tiến bộ kĩ thuật ở Anh chủ yếu diễn ra trong ngành nào?",a:["Dệt, luyện kim và phát minh máy móc","Ngành luyện kim, khai thác mỏ và dệt","Dệt, luyện kim và giao thông vận tải","Khai thác mỏ, dệt và giao thông vận tải"],correct:1},
+{q:"Phát minh nào trong CMCN đã tạo tiền đề cho ô tô, máy bay và dây chuyền khai thác dầu mỏ?",a:["Phương pháp nấu than cốc","Chế tạo hệ thống máy tự động","Phát minh động cơ đốt trong","Phương pháp luyện kim put-đinh"],correct:2},
+{q:"Thành tựu khoa học kĩ thuật quan trọng nhất của CMCN lần thứ hai là?",a:["Máy hơi nước và điện","Động cơ đốt trong và ô tô","Máy hơi nước và điện thoại","Điện và động cơ đốt trong"],correct:3},
+{q:"Phát minh kĩ thuật nào tạo chuyển căn bản trong sản xuất tư bản chủ nghĩa?",a:["Động cơ đốt trong","Máy kéo sợi Gien-ni","Máy tính điện tử","Máy hơi nước"],correct:3},
+{q:"CMCN lần thứ nhất đưa con người bước sang thời đại nào?",a:["Văn minh công nghiệp","Văn minh nông nghiệp","Văn minh thông tin","Văn minh trí tuệ"],correct:0},
+{q:"Nội dung nào phản ánh không đúng ý nghĩa của việc phát minh máy hơi nước?",a:["Lao động bằng tay được thay bằng máy móc","Tốc độ sản xuất tăng vượt bậc","Tạo động lực mới cho công nghiệp hóa","Biến Anh thành công xưởng của thế giới"],correct:3},
+{q:"CMCN thời cận đại không có tác động nào sau đây?",a:["Thúc đẩy kinh tế phát triển","Hình thành trung tâm công nghiệp","Gây ô nhiễm môi trường","Thúc đẩy toàn cầu hóa, tự động hóa, thương mại điện tử"],correct:3},
+{q:"Ý nào không phản ánh đúng điều kiện ở Anh khi tiến hành CMCN thế kỉ XVIII?",a:["Chính trị ổn định","Tài nguyên khoáng sản phong phú","Nhiều trung tâm công nghiệp ở thành thị","Nguồn tích lũy tư bản và lao động dồi dào"],correct:2},
+{q:"Nội dung nào không phản ánh đúng hệ quả tích cực của CMCN thời cận đại?",a:["Thúc đẩy lực lượng sản xuất","Nhiều trung tâm công nghiệp hình thành","Thúc đẩy chuyển biến trong nông nghiệp","Giải quyết triệt để mâu thuẫn xã hội tư bản"],correct:3},
+
+{q:"Đặc trưng cơ bản của CMCN cuối thế kỉ XVIII - đầu XIX là?",a:["Sử dụng năng lượng nước, hơi nước và cơ giới hóa sản xuất","Ứng dụng điện tử và công nghệ thông tin","Sử dụng năng lượng điện với dây chuyền sản xuất hàng loạt","Tối ưu hóa trên nền tảng công nghệ số"],correct:0},
+{q:"Một hậu quả tiêu cực của CMCN thời cận đại là?",a:["Nông nghiệp chuyển sang chuyên canh","Hình thành hai giai cấp tư sản và vô sản","Đấu tranh giữa vô sản với tư sản không ngừng tăng","Nhiều trung tâm công nghiệp xuất hiện"],correct:2},
+{q:"CMCN diễn ra nửa sau thế kỉ XVIII - đầu XIX ở châu Âu là quá trình?",a:["Công nghiệp hóa, hiện đại hóa các nước tư bản châu Âu","Hình thành giai cấp tư sản và công nhân","Cơ khí hóa nền sản xuất thay lao động thủ công","Hình thành nền tảng kinh tế tư bản"],correct:2},
+{q:"Điều kiện cần và đủ để Anh tiến hành CMCN là?",a:["Tư bản và công nhân làm thuê","Tư bản và máy móc hiện đại","Kĩ thuật, đội ngũ công nhân làm thuê đông","Tư bản, nhân công và sự phát triển kĩ thuật"],correct:3},
+{q:"Thời hiện đại, CMCN lần thứ ba còn được gọi là?",a:["Cách mạng 4.0","Cách mạng kĩ thuật số","Cách mạng kĩ thuật","Cách mạng công nghệ"],correct:1},
+{q:"CMCN lần thứ tư còn được gọi là?",a:["Cách mạng kĩ thuật số","Cách mạng công nghiệp nhẹ","Cách mạng kĩ thuật","Cách mạng 4.0"],correct:3},
+{q:"Thành tựu chinh phục vũ trụ của CMCN lần ba gắn với Mĩ và nước nào?",a:["Anh","Trung Quốc","Liên Xô","Ấn Độ"],correct:2},
+{q:"Thành tựu của CMCN lần thứ tư không bao gồm?",a:["Internet","Máy hơi nước","Công nghệ thông tin","Máy tính"],correct:1},
+{q:"Tự động hóa và công nghệ Robot ra đời có điểm hạn chế là?",a:["Nguy cơ người lao động bị mất việc làm","Gây ô nhiễm môi trường","Gây phân hóa giàu nghèo","Con người lệ thuộc thiết bị thông minh"],correct:0},
+{q:"Ý nào không phải là thành tựu cơ bản của CMCN lần thứ ba?",a:["Trí tuệ nhân tạo AI","Máy tính","Mạng Internet không dây","Chinh phục vũ trụ"],correct:0},
+{q:"Internet hiện nay có hạn chế về?",a:["Thay đổi thế giới quan","Dễ bị thâm nhập, đánh mất dữ liệu cá nhân","Con người lệ thuộc thiết bị","Tính chính xác thông tin"],correct:1},
+
+{q:"Nội dung nào không phản ánh đúng về CMCN lần thứ tư?",a:["Khoa học công nghệ làm tài nguyên, lao động phổ thông mất lợi thế","Tạo chênh lệch phát triển","Chỉ tác động khoa học công nghệ, không ảnh hưởng giáo dục và nhân lực","Xuất hiện tội phạm công nghệ cao"],correct:2},
+{q:"Khó khăn cơ bản của giai cấp công nhân Việt Nam trước CMCN 4.0 là?",a:["Chưa đáp ứng trình độ, chuyên môn, kĩ năng nghề nghiệp","Lao động giản đơn tăng","Lao động công nhân vốn đầu tư nước ngoài tăng","Số lượng công nhân tăng nhanh"],correct:0},
+{q:"Đặc điểm lớn nhất của CMCN sau Chiến tranh thế giới thứ hai là?",a:["Kĩ thuật trở thành lực lượng sản xuất trực tiếp","Khoa học trở thành lực lượng sản xuất trực tiếp","Ra đời các lĩnh vực khoa học công nghệ","Phát minh kĩ thuật bắt nguồn sản xuất"],correct:1},
+{q:"Một trong những hệ quả của CMCN hiện đại là?",a:["Hình thành xu thế toàn cầu hóa","Cướp bóc thuộc địa","Hình thành giai cấp công nhân","Tư bản độc quyền thay tự do cạnh tranh"],correct:0},
+{q:"Hoạt động kinh tế chính của cư dân Đông Nam Á cổ đại là?",a:["Nông nghiệp trồng lúa nước","Buôn bán đường biển","Khai thác lâm thổ sản","Thủ công nghiệp"],correct:0},
+{q:"Cư dân Đông Nam Á tiếp thu ảnh hưởng từ nền văn minh nào?",a:["Ấn Độ, Trung Hoa","Ấn Độ, phương Tây","Trung Hoa, phương Tây","Ấn Độ, Trung Hoa, phương Tây"],correct:0},
+{q:"Văn hóa Ấn Độ truyền bá đến Đông Nam Á chủ yếu bằng con đường?",a:["Buôn bán","Truyền bá áp đặt","Xâm lược, thống trị","Giao lưu hữu nghị"],correct:0},
+{q:"Phật giáo, Hin-đu giáo ở Đông Nam Á có nguồn gốc từ?",a:["Phương Tây","Trung Quốc","Nhật Bản","Ấn Độ"],correct:3},
+{q:"Khí hậu gió mùa nóng ẩm, mưa nhiều tác động thế nào đến Đông Nam Á?",a:["Tạo hoang mạc","Cây xanh tốt, khó phát triển","Cung cấp đủ nước cho sinh hoạt và sản xuất","Dân cư thưa vắng"],correct:2},
+{q:"Văn minh Văn Lang - Âu Lạc còn gọi là văn minh?",a:["Sông Hồng","Sông Mã","Sa Huỳnh","Óc Eo"],correct:0},
+
+{q:"Địa bàn cư trú chủ yếu của cư dân Việt cổ là?",a:["Bắc Bộ và Bắc Trung Bộ","Trung Bộ ngày nay","Nam Bộ ngày nay","Toàn lãnh thổ Việt Nam"],correct:0},
+{q:"Kinh tế chính của cư dân Văn Lang - Âu Lạc là?",a:["Săn bắt, hái lượm","Nông nghiệp lúa nước","Thủ công nghiệp","Thương nghiệp"],correct:1},
+{q:"Bộ máy nhà nước Văn Lang - Âu Lạc tổ chức 3 cấp đứng đầu lần lượt là?",a:["Vua - Quan văn, quan võ - Lạc dân","Vua - Lạc hầu, Lạc tướng - Tù trưởng","Vua - Quý tộc, vương hầu - Bồ chính","Vua - Lạc hầu, Lạc tướng - Bồ chính"],correct:3},
+{q:"Hiện vật tiêu biểu cho trình độ chế tác Văn Lang - Âu Lạc là?",a:["Trống đồng Đông Sơn","Tiền đồng Óc Eo","Phù điêu Khương Mỹ","Tượng phật Đồng Dương"],correct:0},
+{q:"Cư dân Chăm-pa cư trú chủ yếu ở khu vực nào?",a:["Bắc Bộ và Bắc Trung Bộ","Trung và Nam Trung Bộ","Khu vực Nam Bộ","Rải rác cả nước"],correct:1},
+{q:"Nền văn minh Chăm-pa phát triển trên nền văn hóa nào?",a:["Đông Nai","Đông Sơn","Sa Huỳnh","Óc Eo"],correct:2},
+{q:"Văn minh Phù Nam phát triển trên nền văn hóa nào?",a:["Đồng Đậu","Sa Huỳnh","Đông Sơn","Óc Eo"],correct:3},
+{q:"Hoạt động kinh tế chủ yếu của cư dân Phù Nam là?",a:["Nông nghiệp","Buôn bán","Thủ công nghiệp","Chăn nuôi trồng trọt"],correct:1},
+{q:"Cư dân Phù Nam cư trú chủ yếu ở khu vực nào?",a:["Bắc Bộ và Bắc Trung Bộ","Nam Bộ","Đồng bằng Sông Hồng","Trung Bộ và Nam Bộ"],correct:1},
+{q:"Đặc điểm chung của các nền văn minh cổ trên đất nước Việt Nam là?",a:["Hình thành ở lưu vực sông lớn","Có giao thoa giữa bản địa và bên ngoài","Chịu ảnh hưởng từ Trung Hoa","Thường nghiệp là kinh tế chính"],correct:1},
+{q:"Ý nào đúng về đặc điểm văn minh Chăm-pa?",a:["Chỉ tiếp thu văn minh Ấn Độ","Giao thoa Trung Hoa và Ấn Độ","Kết hợp văn hóa bản địa với Ấn Độ","Kết hợp Đại Việt và Phù Nam"],correct:2},
+{q:"Nội dung không phải cơ sở hình thành nhà nước Văn Lang - Âu Lạc?",a:["Điều kiện tự nhiên thuận lợi","Chịu ảnh hưởng văn minh bên ngoài","Tan rã công xã nguyên thủy","Nhu cầu đoàn kết chống ngoại xâm"],correct:1},
+{q:"Nền văn minh Phù Nam hình thành trên cơ sở?",a:["Điều kiện tự nhiên khó khăn","Ảnh hưởng mạnh văn minh Ấn Độ","Nền văn hóa Sa Huỳnh","Tiếp thu hoàn toàn Ấn Độ"],correct:1},
+
+{q:"Nội dung nào không phản ánh đời sống tinh thần của người Việt cổ?",a:["Hoạt động kinh tế chính là nông nghiệp lúa nước","Tín ngưỡng phồn thực","Tục xăm mình, ăn trầu, nhuộm răng","Âm nhạc phát triển với nhiều nhạc cụ"],correct:0},
+{q:"Thành tựu tiêu biểu của văn minh Chăm-pa là?",a:["Sáng tạo chữ viết riêng trên cơ sở Phạn","Chịu ảnh hưởng văn minh Ấn Độ","Đời sống vật chất phong phú","Công trình kiến trúc tôn giáo"],correct:0},
+{q:"Biểu hiện Phù Nam có thương nghiệp phát triển là?",a:["Nhiều cảng tốt","Phát triển mạnh ở Đông Nam Á","Nhiều thương cảng trên đường ngoại thương","Nông nghiệp phát triển"],correct:2},
+{q:"Nội dung không phải cơ sở hình thành văn minh Chăm-pa?",a:["Ảnh hưởng văn minh Ấn Độ","Hình thành trên văn hóa Sa Huỳnh","Lưu giữ và phát huy văn hóa bản địa","Chịu ảnh hưởng văn hóa Trung Hoa"],correct:3},
+{q:"Đặc điểm vương quốc Phù Nam là?",a:["Phát triển trên văn hóa Sa Huỳnh","Kinh tế thương nghiệp phát triển","Kinh tế phát triển nhất Đông Nam Á","Gia đình thịnh vượng"],correct:1},
+{q:"Nhận xét đúng về các nền văn minh cổ trên lãnh thổ Việt Nam?",a:["Chỉ tiếp thu Ấn Độ","Chỉ giao thoa Trung Hoa","Kết hợp văn hóa bản địa và bên ngoài","Chỉ chịu văn hóa Trung Hoa"],correct:2},
+{q:"Điểm giống nhau về tổ chức xã hội của các nền văn minh cổ Việt Nam là?",a:["Có vua, quan, quý tộc, dân thường","Chia hai giai cấp thống trị và bị trị","Vua có mọi quyền hành","Quý tộc, quan lại và bình dân"],correct:1},
+{q:"Đặc điểm bộ máy nhà nước Văn Lang - Âu Lạc là?",a:["Chuyên chế trình độ cao","Đảm bảo dân chủ","Chưa hoàn chỉnh, sơ khai","Đơn giản nhưng thể hiện chủ quyền"],correct:3},
+{q:"Vai trò của các nền văn minh cổ Việt Nam là?",a:["Tách biệt với truyền thống Việt","Tạo cơ sở cho nền văn hóa mới","Tạo nên sự đa dạng văn hóa Việt","Giao lưu hòa tan với khu vực"],correct:2},
+{q:"Ý không đúng về vai trò văn minh Văn Lang - Âu Lạc?",a:["Là nền văn minh đầu tiên","Phác họa bản sắc dân tộc","Đưa Việt Nam hòa nhập khu vực","Đặt nền tảng cho văn minh sau này"],correct:2},
+{q:"Điểm giống nhau về cơ sở hình thành các nền văn minh cổ là?",a:["Đều ảnh hưởng Ấn Độ","Đều hình thành ở vùng đồi cao","Đều ảnh hưởng Trung Hoa","Xuất phát từ nhu cầu bảo vệ cộng đồng"],correct:3},
+{q:"Vai trò đúng của văn minh Chăm-pa là?",a:["Bộ phận hình thành bản sắc văn hóa Việt","Sự tách biệt văn hóa","Nguồn sử liệu thế giới","Ý nghĩa bản địa duy nhất"],correct:0},
+{q:"Đặc điểm bộ máy nhà nước Văn Lang - Âu Lạc là?",a:["Hoàn chỉnh do vua Hùng đứng đầu","Khá hoàn chỉnh","Đơn giản, sơ khai, chưa hoàn chỉnh","Ra đời sớm nhất Đông Nam Á"],correct:2},
+{q:"Nội dung không phải cơ sở tự nhiên hình thành Văn Lang - Âu Lạc?",a:["Khí hậu nhiệt đới ẩm gió mùa","Giàu khoáng sản","Sông ngòi dày đặc","Đất đai khô cằn, khó canh tác"],correct:3},
+{q:"Quốc gia nào là nhà nước đầu tiên ở Việt Nam?",a:["Phù Nam","Chăm-pa","Âu Lạc","Văn Lang"],correct:3},
+{q:"Phong tục không phải truyền thống của người Việt cổ là?",a:["Thờ Chúa","Ăn trầu","Nhuộm răng","Xăm mình"],correct:0},
+{q:"Người Việt cổ không có tín ngưỡng nào?",a:["Thờ tổ tiên","Thờ Đức Phật","Sùng bái tự nhiên","Tín ngưỡng phồn thực"],correct:1},
+{q:"Ý nào không đúng về cơ sở ra đời Văn Lang - Âu Lạc?",a:["Nhu cầu phát triển buôn bán với tộc người khác","Nhu cầu trị thủy nông nghiệp","Đấu tranh chống giặc ngoại xâm","Chuyển biến kinh tế - xã hội"],correct:0},
+{q:"Chữ viết, tư tưởng, tôn giáo, mô hình nhà nước Ấn Độ du nhập vào Chăm-pa qua đâu?",a:["Thương nhân","Dân du mục","Chiến tranh xâm lược","Đoàn thám hiểm"],correct:0},
+{q:"Di sản văn hóa thế giới của cư dân Chăm-pa còn tồn tại ngày nay là?",a:["Hoàng thành Thăng Long","Cố đô Huế","Thánh địa Mỹ Sơn","Phố cổ Hội An"],correct:2},
+{q:"Nhân tố quan trọng phát triển ngoại thương đường biển ở Phù Nam?",a:["Nông nghiệp phát triển","Kĩ thuật đóng tàu","Điều kiện tự nhiên, vị trí địa lí thuận lợi","Nội thương phát triển"],correct:2},
+
+{q:"Kinh tế chính của cư dân Phù Nam là?",a:["Nông nghiệp, đánh cá, khai thác hải sản","Nông nghiệp lúa, thủ công nghiệp, ngoại thương đường biển","Thủ công nghiệp, buôn bán với các nước châu Âu","Thủ công nghiệp, khai thác hải sản"],correct:1},
+{q:"Điểm giống nhau trong đời sống kinh tế Phù Nam với Văn Lang - Âu Lạc và Chăm-pa là?",a:["Trồng lúa kết hợp thủ công","Phát triển đánh bắt thủy hải sản","Giao lưu buôn bán với bên ngoài","Khai thác lâm thổ sản"],correct:0},
+{q:"Chế độ kéo dài trong cộng đồng người Chăm?",a:["Phụ hệ","Mẫu hệ","Vua - tôi","Quân - dân"],correct:1},
+{q:"Loại hình kiến trúc tiêu biểu của Chăm-pa là?",a:["Đền tháp","Chùa chiền","Cung điện","Nhà thờ"],correct:0},
+{q:"Văn minh Ấn Độ du nhập vào Phù Nam qua?",a:["Nhà sư","Thương nhân và nhà truyền giáo","Chiến tranh xâm lược","Đoàn thám hiểm"],correct:1},
+{q:"Dưới triều Lê thế kỉ XV, bộ luật nào được ban hành?",a:["Hình luật","Hình thư","Quốc triều hình luật","Hoàng Việt luật lệ"],correct:2},
+{q:"Triều đại nào mở đầu phong kiến độc lập của nước ta?",a:["Triều Lý","Triều Ngô","Triều Lê","Triều Nguyễn"],correct:1},
+{q:"Phong kiến Việt Nam xây dựng theo thể chế?",a:["Quân chủ lập hiến","Chiếm hữu nô lệ","Dân chủ chủ nô","Quân chủ chuyên chế"],correct:3},
+{q:"Bộ máy nhà nước chuyên chế trung ương tập quyền Đại Việt hoàn chỉnh dưới triều nào?",a:["Thời Lý","Thời Trần","Thời Lê sơ","Thời Hồ"],correct:2},
+{q:"Lễ cày tịch điền mang ý nghĩa nào?",a:["Nhà nước coi trọng nông nghiệp","Coi trọng bảo vệ độc lập","Tình cảm vua dân","Khuyến khích thương nghiệp"],correct:0},
+{q:"Trung tâm chính trị - văn hóa và đô thị lớn nhất Đại Việt thế kỉ X-XV là?",a:["Phố Hiến","Thanh Hà","Thăng Long","Hội An"],correct:2},
+{q:"Tam giáo đồng nguyên là sự hòa hợp của?",a:["Phật giáo - Đạo giáo - Nho giáo","Phật giáo - Nho giáo - Thiên Chúa","Phật giáo - Đạo giáo - Tín ngưỡng dân gian","Nho giáo - Phật giáo - Ấn Độ giáo"],correct:0},
+{q:"Hai loại hình văn học chính Đại Việt là?",a:["Văn học nhà nước và dân gian","Văn học viết và truyền miệng","Văn học nhà nước và tự do","Văn học dân gian và văn học viết"],correct:3},
+{q:"Chữ Nôm trở thành chữ viết chính thống dưới triều nào?",a:["Nhà Lý","Nhà Trần","Lê sơ","Tây Sơn"],correct:3},
+{q:"Dựng bia đá ở Văn Miếu Quốc Tử Giám thể hiện chính sách nào?",a:["Coi trọng giáo dục, khoa cử","Ghi danh anh hùng","Ghi tiến trình lịch sử","Đề cao nông nghiệp"],correct:0},
+
+{q:"Nội dung không phải cơ sở hình thành văn minh Đại Việt?",a:["Có nguồn từ các nền văn minh cổ","Tiếp thu có chọn lọc văn minh bên ngoài","Nho giáo là tư tưởng chính thống sau chống phong kiến","Đấu tranh dựng nước giữ nước"],correct:2},
+{q:"Nội dung nào phản ánh không phải chính sách nhà nước phong kiến Đại Việt khuyến khích nông nghiệp?",a:["Khuyến khích buôn bán với phương Tây","Khuyến khích khai hoang","Tổ chức nghi lễ cầu mùa","Quan tâm trị thủy"],correct:0},
+{q:"Văn học chữ Nôm ra đời có ý nghĩa gì?",a:["Phát triển văn minh Lý - Trần","Tiếp thu văn hóa Ấn Độ","Thể hiện sáng tạo, tiếp biến văn hóa Việt","Ảnh hưởng Công giáo"],correct:2},
+{q:"Nội dung phản ánh không đúng cơ sở văn minh Đại Việt là?",a:["Nguồn từ văn minh lâu đời","Lưu truyền kinh nghiệm nông nghiệp","Tiếp thu hoàn toàn văn minh bên ngoài","Ảnh hưởng Trung Hoa qua Bắc thuộc"],correct:2},
+{q:"Vì sao Nho giáo thành hệ tư tưởng chính thống ở Đại Việt?",a:["Phổ biến rộng rãi","Góp phần củng cố quyền lực thống trị","Chung sống với tín ngưỡng dân gian","Dễ tiếp thu"],correct:1},
+{q:"Tên bộ luật thành văn đầu tiên của Đại Việt là?",a:["Hình Luật","Hình thư","Hồng Đức","Gia Long"],correct:1},
+{q:"Bộ luật hoàn chỉnh thế kỉ XV là?",a:["Hình Luật","Quốc triều hình luật","Hình thư","Hoàng Việt luật lệ"],correct:1},
+{q:"Văn minh Đại Việt không mang ý nghĩa nào?",a:["Thể hiện sức sáng tạo nhân dân","Chứng minh phát triển trước nhiều lĩnh vực","Góp phần tạo sức mạnh chống ngoại xâm","Là nền tảng sánh ngang cường quốc thế giới"],correct:3},
+{q:"Nhận xét đúng về văn minh Đại Việt?",a:["Phát triển đa dạng, phong phú, đậm tính dân tộc","Phát triển đa dạng, lâu đời và chính thống","Kết hợp hoàn toàn Trung Hoa và Ấn Độ","Thiết chế chính trị dân chủ"],correct:0},
+
+{q:"Hiện nay Việt Nam có bao nhiêu dân tộc?",a:["58","60","51","54"],correct:3},
+{q:"Lễ hội các dân tộc Việt Nam thường gắn với hoạt động sản xuất nào?",a:["Công nghiệp","Thương nghiệp","Nông nghiệp","Thủ công nghiệp"],correct:2},
+{q:"Vì sao các dân tộc vẫn sử dụng trang phục giống người Kinh?",a:["Để hòa hợp, đoàn kết dân tộc","Đẹp hơn truyền thống","Do môi trường sống","Thuận tiện lao động và đi lại"],correct:3},
+{q:"Dân tộc có số lượng đông nhất ở Việt Nam là?",a:["Kinh","Tày","Mèo","Mường"],correct:0},
+{q:"Tín ngưỡng truyền thống hầu hết dân tộc Việt Nam thực hiện là?",a:["Thờ cúng tổ tiên","Thờ Thánh Gióng","Thờ thần thực khí","Thờ Thánh Tản Viên"],correct:0},
+{q:"Ngữ hệ có nhiều dân tộc sử dụng nhất?",a:["Nam Á","H'Mông - Dao","Thái - Ka-đai","Hán - Tạng"],correct:0},
+{q:"Ngôn ngữ chính thức của nhà nước Việt Nam hiện nay là?",a:["Tiếng Nôm","Tiếng Việt","Tiếng Thái","Tiếng Anh"],correct:1},
+{q:"Các dân tộc Việt Nam chủ yếu hoạt động sản xuất trong lĩnh vực nào?",a:["Thủ công nghiệp","Nông nghiệp","Xây dựng đền đài","Thương nghiệp"],correct:1},
+{q:"Cụm từ mô tả cộng đồng có cùng nguồn gốc, đặc điểm ngữ âm, thanh điệu, cú pháp, vốn từ là?",a:["Ngữ hệ","Tiếng nói","Chữ viết","Ngôn từ"],correct:0},
+{q:"Nội dung nào không đúng về vai trò của lễ hội với đời sống văn hóa tinh thần các dân tộc?",a:["Bày tỏ biết ơn thần linh, tổ tiên","Là cơ sở vật chất tạo nên phát triển kinh tế - văn hóa - xã hội","Góp phần giữ gìn bản sắc","Dịp gặp gỡ, đoàn kết"],correct:1}
+];
+
+function shuffle(arr){
+  return arr.sort(() => Math.random() - 0.5);
+}
+
+let score = 0;
+let answered = 0;
+
+function loadQuiz(){
+  const quiz = document.getElementById("quiz");
+  quiz.innerHTML = "";
+  score = 0;
+  answered = 0;
+  document.getElementById("score").innerText = "Điểm: 0/100";
+
+  let list = shuffle([...questions]);
+
+  list.forEach((item,index)=>{
+    const box = document.createElement("div");
+    box.className = "question";
+    box.innerHTML = `<h3>Câu ${index+1}: ${item.q}</h3>`;
+
+    item.a.forEach((ans,i)=>{
+      const btn = document.createElement("button");
+      btn.className = "answer";
+      btn.innerText = String.fromCharCode(65+i)+". "+ans;
+
+      btn.onclick = function(){
+        if(box.dataset.done) return;
+        box.dataset.done = true;
+        answered++;
+
+        const buttons = box.querySelectorAll(".answer");
+
+        if(i === item.correct){
+          btn.classList.add("correct");
+          score++;
+          box.innerHTML += `<div class="result" style="color:#4ade80">Đúng</div>`;
+        }else{
+          btn.classList.add("wrong");
+          buttons[item.correct].classList.add("correct");
+          box.innerHTML += `<div class="result" style="color:#f87171">
+          Sai — Đáp án đúng: ${String.fromCharCode(65+item.correct)}. ${item.a[item.correct]}
+          </div>`;
+        }
+
+        document.getElementById("score").innerText = `Điểm: ${score}/100`;
+
+        if(answered === 100){
+          setTimeout(()=>alert(`Hoàn thành! Em đúng ${score}/100 câu`),300);
+        }
+      };
+
+      box.appendChild(btn);
+    });
+
+    quiz.appendChild(box);
+  });
+
+  window.scrollTo(0,0);
+}
+
+loadQuiz();
+</script>
+
+</body>
+</html>
